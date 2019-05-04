@@ -403,6 +403,7 @@ std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(VFilePtr &f)
 
 	return mdlData;
 }
+
 std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(const std::string &path)
 {
 	VFilePtr f = FileManager::OpenSystemFile(path.c_str(),"rb");
