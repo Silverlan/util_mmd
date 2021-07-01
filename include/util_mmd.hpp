@@ -9,6 +9,7 @@
 #include <cinttypes>
 #include <vector>
 #include <memory>
+#include <string>
 #include <mathutil/umath.h>
 
 class VFilePtrInternal;
@@ -76,6 +77,7 @@ namespace mmd
 
 		struct Bone
 		{
+			std::string nameJp;
 			std::string name;
 			std::array<float,3> position;
 			int32_t parentBoneIdx = -1;
@@ -97,6 +99,52 @@ namespace mmd
 
 		std::shared_ptr<ModelData> load(const std::string &path);
 		std::shared_ptr<ModelData> load(std::shared_ptr<VFilePtrInternal> &f);
+	};
+
+	namespace vmd
+	{
+#pragma pack(push,1)
+		struct Keyframe
+		{
+			std::array<char,15> boneName;
+			uint32_t frameIndex;
+			std::array<float,3> position;
+			std::array<float,4> rotation;
+			std::array<uint8_t,64> interpolation;
+		};
+		struct Morph
+		{
+			std::array<char,15> morphName;
+			uint32_t frameIndex;
+			float weight;
+		};
+		struct Camera
+		{
+			uint32_t frameIndex;
+			float negDistance;
+			std::array<float,3> position;
+			std::array<float,3> angles;
+			std::array<uint8_t,24> interpolation;
+			uint32_t viewingngle;
+			uint8_t perspective;
+		};
+		struct Light
+		{
+			uint32_t frameIndex;
+			std::array<float,3> color;
+			std::array<float,3> position;
+		};
+#pragma pack(pop)
+		struct AnimationData
+		{
+			std::string modelName;
+			std::vector<Keyframe> keyframes;
+			std::vector<Morph> morphs;
+			std::vector<Camera> cameras;
+			std::vector<Light> lights;
+		};
+		std::shared_ptr<AnimationData> load(const std::string &path);
+		std::shared_ptr<AnimationData> load(std::shared_ptr<VFilePtrInternal> &f);
 	};
 };
 

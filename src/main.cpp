@@ -4,6 +4,7 @@
 
 #include "util_mmd.hpp"
 #include <fsys/filesystem.h>
+#include <sharedutils/util_string.h>
 #include <utf8.h>
 
 #pragma comment(lib,"vfilesystem.lib")
@@ -13,6 +14,7 @@
 #include <iostream>
 #pragma optimize("",off)
 #endif
+#pragma optimize("",off)
 
 namespace mmd
 {
@@ -70,7 +72,7 @@ std::string mmd::pmx::read_text(VFilePtr &f,TextEncoding encoding)
 		}
 		case TextEncoding::UTF16:
 		{
-			std::vector<int16_t> data(len /2 +((len %2) == 0 ? 0 : 1));
+			std::vector<uint16_t> data(len /2 +((len %2) == 0 ? 0 : 1));
 			f->Read(data.data(),len);
 
 			std::vector<int8_t> utf8Data;
@@ -223,7 +225,7 @@ std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(VFilePtr &f)
 	{
 		mdlData->bones.push_back({});
 		auto &bone = mdlData->bones.back();
-		auto name = read_text(f,textEncoding);
+		bone.nameJp = read_text(f,textEncoding);
 		bone.name = read_text(f,textEncoding);
 		bone.position = f->Read<std::array<float,3>>();
 		bone.parentBoneIdx = read_index(f,boneIndexSize);
@@ -411,6 +413,53 @@ std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(const std::string &path)
 		return nullptr;
 	return load(f);
 }
+
+std::shared_ptr<mmd::vmd::AnimationData> mmd::vmd::load(const std::string &path)
+{
+	VFilePtr f = FileManager::OpenSystemFile(path.c_str(),"rb");
+	if(f == nullptr)
+		return nullptr;
+	return load(f);
+}
+
+template<class T>
+	std::vector<T> read_keyframe_data(std::shared_ptr<VFilePtrInternal> &f)
+{
+	auto n = f->Read<uint32_t>();
+	std::vector<T> keyframes;
+	keyframes.resize(n);
+	f->Read(keyframes.data(),keyframes.size() *sizeof(keyframes.front()));
+	std::sort(keyframes.begin(),keyframes.end(),[](const T &a,const T &b) {
+		return a.frameIndex < b.frameIndex;
+	});
+	return keyframes;
+}
+std::shared_ptr<mmd::vmd::AnimationData> mmd::vmd::load(std::shared_ptr<VFilePtrInternal> &f)
+{
+	std::array<char,30> ident;
+	f->Read(ident.data(),ident.size() *sizeof(ident.front()));
+	uint32_t version;
+	if(ustring::compare(ident.data(),"Vocaloid Motion Data file"))
+		version = 1;
+	else if(ustring::compare(ident.data(),"Vocaloid Motion Data 0002"))
+		version = 2;
+	else
+		return nullptr;
+
+	auto animData = std::make_shared<mmd::vmd::AnimationData>();
+	
+	std::array<char,20> mdlName;
+	uint32_t mdlNameLen = (version == 1) ? 10 : 20;
+	f->Read(mdlName.data(),mdlNameLen *sizeof(mdlName.front()));
+	animData->modelName = std::string{mdlName.data(),mdlNameLen};
+
+	animData->keyframes = read_keyframe_data<Keyframe>(f);
+	animData->morphs = read_keyframe_data<Morph>(f);
+	animData->cameras = read_keyframe_data<Camera>(f);
+	animData->lights = read_keyframe_data<Light>(f);
+	return animData;
+}
+#pragma optimize("",on)
 #ifdef MMD_TEST
 int main(int argc,char *argv[])
 {
