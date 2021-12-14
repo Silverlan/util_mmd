@@ -12,7 +12,7 @@
 #include <string>
 #include <mathutil/umath.h>
 
-class VFilePtrInternal;
+namespace ufile {struct IFile;};
 namespace mmd
 {
 	namespace pmx
@@ -98,7 +98,7 @@ namespace mmd
 		};
 
 		std::shared_ptr<ModelData> load(const std::string &path);
-		std::shared_ptr<ModelData> load(std::shared_ptr<VFilePtrInternal> &f);
+		std::shared_ptr<ModelData> load(ufile::IFile &f);
 	};
 
 	namespace vmd
@@ -144,7 +144,7 @@ namespace mmd
 			std::vector<Light> lights;
 		};
 		std::shared_ptr<AnimationData> load(const std::string &path);
-		std::shared_ptr<AnimationData> load(std::shared_ptr<VFilePtrInternal> &f);
+		std::shared_ptr<AnimationData> load(ufile::IFile &f);
 	};
 };
 
