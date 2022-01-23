@@ -17,17 +17,18 @@ namespace mmd
 {
 	namespace pmx
 	{
-		enum class DrawingMode : char
+		enum class DrawingMode : uint8_t
 		{
-			NoCull = 0,
-			GroundShadow = 1,
-			DrawShadow = 2,
-			ReceiveShadow = 3,
-			HasEdge = 4,
-			VertexColor = 5,
-			PointDrawing = 6,
-			LineDrawing = 7
+			NoCull = 1,
+			GroundShadow = NoCull<<1u,
+			DrawShadow = GroundShadow<<1u,
+			ReceiveShadow = DrawShadow<<1u,
+			HasEdge = ReceiveShadow<<1u,
+			VertexColor = HasEdge<<1u,
+			PointDrawing = VertexColor<<1u,
+			LineDrawing = PointDrawing<<1u
 		};
+		REGISTER_BASIC_BITWISE_OPERATORS(DrawingMode);
 
 		enum class BoneFlag : uint16_t
 		{
@@ -91,7 +92,7 @@ namespace mmd
 			std::string characterName;
 			std::string comment;
 			std::vector<VertexData> vertices;
-			std::vector<uint16_t> faces;
+			std::vector<uint32_t> faces;
 			std::vector<std::string> textures;
 			std::vector<MaterialData> materials;
 			std::vector<Bone> bones;
