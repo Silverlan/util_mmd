@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <mathutil/umath.h>
+#include <mathutil/umat.h>
 
 namespace ufile {struct IFile;};
 namespace mmd
@@ -80,10 +81,11 @@ namespace mmd
 		{
 			std::string nameJp;
 			std::string name;
-			std::array<float,3> position;
+			Vector3 position;
 			int32_t parentBoneIdx = -1;
 			int32_t layer = -1;
 			BoneFlag flags = BoneFlag::None;
+			Mat3 rotation = umat::identity();
 		};
 
 		struct ModelData

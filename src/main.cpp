@@ -6,6 +6,7 @@
 #include <fsys/filesystem.h>
 #include <sharedutils/util_string.h>
 #include <sharedutils/util_ifile.hpp>
+#include <mathutil/uvec.h>
 #include <utf8.h>
 #include <fsys/ifile.hpp>
 
@@ -229,7 +230,7 @@ std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(ufile::IFile &f)
 		auto &bone = mdlData->bones.back();
 		bone.nameJp = read_text(f,textEncoding);
 		bone.name = read_text(f,textEncoding);
-		bone.position = f.Read<std::array<float,3>>();
+		bone.position = f.Read<Vector3>();
 		bone.parentBoneIdx = read_index(f,boneIndexSize);
 		bone.layer = f.Read<int32_t>();
 		bone.flags = f.Read<BoneFlag>();
@@ -256,9 +257,20 @@ std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(ufile::IFile &f)
 		}
 		if((bone.flags &BoneFlag::LocalCoordinate) != BoneFlag::None)
 		{
-			auto xVec = f.Read<std::array<float,3>>();
-			auto yVec = f.Read<std::array<float,3>>();
+			auto xVec = f.Read<Vector3>();
+			auto zVec = f.Read<Vector3>();
+			uvec::normalize(&xVec);
+			uvec::normalize(&zVec);
+			auto yVec = uvec::cross(zVec,xVec);
+			zVec = uvec::cross(xVec,yVec);
+			uvec::normalize(&yVec);
+			uvec::normalize(&zVec);
 
+			bone.rotation = Mat3{
+				xVec.x,xVec.y,xVec.z,
+				yVec.x,yVec.y,yVec.z,
+				zVec.x,zVec.y,zVec.z
+			};
 		}
 		if((bone.flags &BoneFlag::ExternalParentDeform) != BoneFlag::None)
 		{
