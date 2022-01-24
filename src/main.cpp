@@ -62,6 +62,38 @@ namespace mmd
 	};
 };
 
+mmd::pmx::Morph::~Morph()
+{
+	if(!morphs)
+		return;
+	switch(type)
+	{
+	case MorphType::Group:
+	case MorphType::Flip:
+		delete[] static_cast<GroupMorph*>(morphs);
+		break;
+	case MorphType::Vertex:
+		delete[] static_cast<VertexMorph*>(morphs);
+		break;
+	case MorphType::Bone:
+		delete[] static_cast<BoneMorph*>(morphs);
+		break;
+	case MorphType::Uv:
+	case MorphType::Uva1:
+	case MorphType::Uva2:
+	case MorphType::Uva3:
+	case MorphType::Uva4:
+		delete[] static_cast<UvMorph*>(morphs);
+		break;
+	case MorphType::Material:
+		delete[] static_cast<MaterialMorph*>(morphs);
+		break;
+	case MorphType::Impulse:
+		delete[] static_cast<ImpulseMorph*>(morphs);
+		break;
+	}
+}
+
 std::string mmd::pmx::read_text(ufile::IFile &f,TextEncoding encoding)
 {
 	auto len = f.Read<int32_t>();
@@ -297,26 +329,67 @@ std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(ufile::IFile &f)
 		}
 	}
 
-	/*auto numMorphs = f.Read<int32_t>();
+	auto numMorphs = f.Read<int32_t>();
 	for(auto i=decltype(numMorphs){0};i<numMorphs;++i)
 	{
-		auto morphNameLocal = read_text(f,textEncoding);
-		auto morphNameGlobal = read_text(f,textEncoding);
-		auto panelType = f.Read<int8_t>();
-		auto morphType = f.Read<int8_t>();
-		auto offsetCount = f.Read<int32_t>();
-		if(morphType == 1)
-		{
-			for(auto i=decltype(offsetCount){0};i<offsetCount;++i)
+		auto morph = std::make_unique<Morph>();
+		morph->nameLocal = read_text(f,textEncoding);
+		morph->nameGlobal = read_text(f,textEncoding);
+		morph->panelType = f.Read<int8_t>();
+		morph->type = f.Read<MorphType>();
+		morph->count = f.Read<int32_t>();
+		morph->morphs = nullptr;
+		auto initMorphs = [&morph,&f]<class T>(IndexType indexType) {
+			morph->morphs = new T[morph->count];
+			for(auto i=decltype(morph->count){0u};i<morph->count;++i)
 			{
-				auto vertIdx = read_vertex_index(f,morphIndexSize);
-				std::cout<<vertIdx<<std::endl;
+				auto &m = static_cast<T*>(morph->morphs)[i];
+				m.index = read_vertex_index(f,indexType);
+				auto *ptr = reinterpret_cast<uint8_t*>(&m.index) +sizeof(m.index);
+				f.Read(ptr,sizeof(T) -sizeof(m.index));
 			}
+		};
+		switch(morph->type)
+		{
+		case MorphType::Group:
+		case MorphType::Flip:
+		{
+			initMorphs.template operator()<GroupMorph>(morphIndexSize);
+			break;
 		}
-		// ???
-		//auto offset
+		case MorphType::Vertex:
+		{
+			initMorphs.template operator()<VertexMorph>(vertexIndexSize);
+			break;
+		}
+		case MorphType::Bone:
+		{
+			initMorphs.template operator()<BoneMorph>(boneIndexSize);
+			break;
+		}
+		case MorphType::Uv:
+		case MorphType::Uva1:
+		case MorphType::Uva2:
+		case MorphType::Uva3:
+		case MorphType::Uva4:
+		{
+			initMorphs.template operator()<UvMorph>(vertexIndexSize);
+			break;
+		}
+		case MorphType::Material:
+		{
+			initMorphs.template operator()<MaterialMorph>(materialIndexSize);
+			break;
+		}
+		case MorphType::Impulse:
+		{
+			initMorphs.template operator()<ImpulseMorph>(rigidBodyIndexSize);
+			break;
+		}
+		}
+		mdlData->morphs.push_back(std::move(morph));
 	}
-
+	/*
 	auto numDisplayFrames = f.Read<int32_t>();
 	for(auto i=decltype(numDisplayFrames){0};i<numDisplayFrames;++i)
 	{

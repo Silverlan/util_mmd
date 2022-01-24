@@ -49,6 +49,21 @@ namespace mmd
 		};
 		REGISTER_BASIC_BITWISE_OPERATORS(BoneFlag);
 
+		enum class MorphType : int8_t
+		{
+			Group = 0,
+			Vertex,
+			Bone,
+			Uv,
+			Uva1,
+			Uva2,
+			Uva3,
+			Uva4,
+			Material,
+			Flip,
+			Impulse
+		};
+
 		struct VertexData
 		{
 			std::array<float,3> position;
@@ -88,6 +103,76 @@ namespace mmd
 			Mat3 rotation = umat::identity();
 		};
 
+		struct BaseMorph {};
+
+#pragma pack(push,1)
+		struct GroupMorph
+			: public BaseMorph
+		{
+			int32_t index;
+			float ratio;
+		};
+
+		struct VertexMorph
+			: public BaseMorph
+		{
+			int32_t index;
+			Vector3 offset;
+		};
+
+		struct BoneMorph
+			: public BaseMorph
+		{
+			int32_t index;
+			Vector3 translation;
+			Vector4 rotation;
+		};
+
+		struct UvMorph
+			: public BaseMorph
+		{
+			int32_t index;
+			Vector4 offset;
+		};
+
+		struct MaterialMorph
+			: public BaseMorph
+		{
+			int32_t index;
+			uint8_t type;
+			Vector4 diffuse;
+			Vector3 specular;
+			float shininess;
+			Vector3 ambient;
+			Vector4 edgeColor;
+			float edgeSize;
+			Vector4 tex;
+			Vector4 sphere;
+			Vector4 toon;
+		};
+
+		struct ImpulseMorph
+			: public BaseMorph
+		{
+			int32_t index;
+			uint8_t local;
+			Vector3 velocity;
+			Vector3 torque;
+		};
+#pragma pack(pop)
+
+		struct Morph
+		{
+			~Morph();
+			std::string nameLocal;
+			std::string nameGlobal;
+			int8_t panelType;
+			MorphType type;
+			int32_t count;
+
+			BaseMorph *morphs;
+		};
+
 		struct ModelData
 		{
 			float version = 0.f;
@@ -98,6 +183,7 @@ namespace mmd
 			std::vector<std::string> textures;
 			std::vector<MaterialData> materials;
 			std::vector<Bone> bones;
+			std::vector<std::unique_ptr<Morph>> morphs;
 		};
 
 		std::shared_ptr<ModelData> load(const std::string &path);
