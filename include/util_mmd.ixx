@@ -2,9 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef __UTIL_MMD_HPP__
-#define __UTIL_MMD_HPP__
-
 #include <array>
 #include <cinttypes>
 #include <vector>
@@ -16,7 +13,10 @@
 namespace ufile {
 	struct IFile;
 };
-namespace mmd {
+
+export module util_mmd;
+
+export namespace mmd {
 	namespace pmx {
 		enum class DrawingMode : uint8_t { NoCull = 1, GroundShadow = NoCull << 1u, DrawShadow = GroundShadow << 1u, ReceiveShadow = DrawShadow << 1u, HasEdge = ReceiveShadow << 1u, VertexColor = HasEdge << 1u, PointDrawing = VertexColor << 1u, LineDrawing = PointDrawing << 1u };
 		REGISTER_BASIC_BITWISE_OPERATORS(DrawingMode);
@@ -189,5 +189,3 @@ namespace mmd {
 		std::shared_ptr<AnimationData> load(ufile::IFile &f);
 	};
 };
-
-#endif
