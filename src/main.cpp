@@ -2,14 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#include "util_mmd.hpp"
 #include <fsys/filesystem.h>
 #include <sharedutils/util_string.h>
 #include <sharedutils/util_ifile.hpp>
 #include <mathutil/uvec.h>
 #include <utf8.h>
 #include <fsys/ifile.hpp>
-
-module util_mmd;
 
 #pragma comment(lib, "vfilesystem.lib")
 #pragma comment(lib, "mathutil.lib")

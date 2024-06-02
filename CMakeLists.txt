@@ -89,11 +89,19 @@ function(def_vs_filters FILE_LIST)
 	endforeach()
 endfunction(def_vs_filters)
 
-add_library(${PROJ_NAME} ${LIB_TYPE})
+file(GLOB_RECURSE SRC_FILES
+    "${CMAKE_CURRENT_LIST_DIR}/src/*.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/*.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/*.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/include/*.h"
+    "${CMAKE_CURRENT_LIST_DIR}/include/*.hpp"
+)
+add_library(${PROJ_NAME} ${LIB_TYPE} ${SRC_FILES})
 if(WIN32)
 	target_compile_options(${PROJ_NAME} PRIVATE /wd4251)
 	target_compile_options(${PROJ_NAME} PRIVATE /wd4996)
 endif()
+def_vs_filters("${SRC_FILES}")
 
 foreach(LIB IN LISTS LIBRARIES)
 	target_link_libraries(${PROJ_NAME} ${${LIB}})
@@ -101,14 +109,6 @@ endforeach(LIB)
 
 target_include_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
 target_include_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
-
-target_sources(${PROJ_NAME}
-  PUBLIC
-    FILE_SET cxx_modules TYPE CXX_MODULES FILES
-    include/util_mmd.ixx
-
-    src/util_mmd.cpp
-)
 
 foreach(INCLUDE_PATH IN LISTS INCLUDE_DIRS)
 	target_include_directories(${PROJ_NAME} PRIVATE ${${INCLUDE_PATH}})
