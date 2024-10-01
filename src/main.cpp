@@ -116,7 +116,7 @@ std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(ufile::IFile &f)
 		return nullptr;
 	auto len = f.Read<char>();
 	auto textEncoding = f.Read<TextEncoding>();
-	auto appendixUvCount = f.Read<char>();
+	auto appendixDataCount = f.Read<char>();
 	auto vertexIndexSize = f.Read<IndexType>();
 	auto textureIndexSize = f.Read<IndexType>();
 	auto materialIndexSize = f.Read<IndexType>();
@@ -139,8 +139,8 @@ std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(ufile::IFile &f)
 		v.position = f.Read<std::array<float, 3>>();
 		v.normal = f.Read<std::array<float, 3>>();
 		v.uv = f.Read<std::array<float, 2>>();
-		std::vector<float> appendixUv(appendixUvCount);
-		f.Read(appendixUv.data(), appendixUv.size() * sizeof(appendixUv.front()));
+		std::vector<Vector4> appendixData(appendixDataCount);
+		f.Read(appendixData.data(), appendixData.size() * sizeof(appendixData.front()));
 		auto weightType = f.Read<WeightType>();
 		switch(weightType) {
 		case WeightType::BDEF1:
