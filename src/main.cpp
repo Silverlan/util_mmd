@@ -109,7 +109,9 @@ int32_t mmd::pmx::read_vertex_index(ufile::IFile &f, IndexType type) { return re
 std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(ufile::IFile &f)
 {
 	auto signature = f.Read<std::array<char, 4>>();
-	if(signature.at(0) != 'P' || signature.at(1) != 'M' || signature.at(2) != 'X' || signature.at(3) != ' ')
+	// Note: The fourth character in the header for the model https://bowlroll.net/file/306256 is '@' instead of a space,
+	// but the format seems to be exactly the same other than that.
+	if(signature.at(0) != 'P' || signature.at(1) != 'M' || signature.at(2) != 'X' || (signature.at(3) != ' ' && signature.at(3) != '@'))
 		return nullptr;
 	auto version = f.Read<float>();
 	if(version != 2.f)
