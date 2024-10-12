@@ -254,11 +254,11 @@ std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(ufile::IFile &f)
 			uvec::normalize(&xVec);
 			uvec::normalize(&zVec);
 			auto yVec = uvec::cross(zVec, xVec);
-			zVec = uvec::cross(xVec, yVec);
 			uvec::normalize(&yVec);
+			zVec = uvec::cross(xVec, yVec);
 			uvec::normalize(&zVec);
 
-			bone.rotation = Mat3 {xVec.x, xVec.y, xVec.z, yVec.x, yVec.y, yVec.z, zVec.x, zVec.y, zVec.z};
+			bone.rotation = Mat3 {xVec, yVec, zVec};
 		}
 		if((bone.flags & BoneFlag::ExternalParentDeform) != BoneFlag::None) {
 			auto parentIndex = read_index(f, boneIndexSize);
