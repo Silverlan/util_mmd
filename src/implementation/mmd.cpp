@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "util_mmd.hpp"
+module;
+
 #include <fsys/filesystem.h>
 #include <sharedutils/util_string.h>
 #include <sharedutils/util_ifile.hpp>
@@ -15,11 +16,11 @@
 
 #ifdef MMD_TEST
 #include <iostream>
-#pragma optimize("", off)
 #endif
-#pragma optimize("", off)
 
-namespace mmd {
+module pragma.assets.importer.mmd;
+
+namespace pragma::assets::importer::mmd {
 	namespace pmx {
 		enum class TextEncoding : char { UTF16 = 0, UTF8 };
 
@@ -38,7 +39,7 @@ namespace mmd {
 	};
 };
 
-mmd::pmx::Morph::~Morph()
+pragma::assets::importer::mmd::pmx::Morph::~Morph()
 {
 	if(!morphs)
 		return;
@@ -69,7 +70,7 @@ mmd::pmx::Morph::~Morph()
 	}
 }
 
-std::string mmd::pmx::read_text(ufile::IFile &f, TextEncoding encoding)
+std::string pragma::assets::importer::mmd::pmx::read_text(ufile::IFile &f, TextEncoding encoding)
 {
 	auto len = f.Read<int32_t>();
 	switch(encoding) {
@@ -92,7 +93,7 @@ std::string mmd::pmx::read_text(ufile::IFile &f, TextEncoding encoding)
 	return "";
 }
 template<typename T0, typename T1, typename T2>
-int32_t mmd::pmx::read_index(ufile::IFile &f, IndexType type)
+int32_t pragma::assets::importer::mmd::pmx::read_index(ufile::IFile &f, IndexType type)
 {
 	switch(type) {
 	case IndexType::Byte:
@@ -104,9 +105,9 @@ int32_t mmd::pmx::read_index(ufile::IFile &f, IndexType type)
 	}
 	throw std::logic_error("Invalid index type");
 }
-int32_t mmd::pmx::read_index(ufile::IFile &f, IndexType type) { return read_index<int8_t, int16_t, int32_t>(f, type); }
-int32_t mmd::pmx::read_vertex_index(ufile::IFile &f, IndexType type) { return read_index<uint8_t, uint16_t, int32_t>(f, type); }
-std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(ufile::IFile &f)
+int32_t pragma::assets::importer::mmd::pmx::read_index(ufile::IFile &f, IndexType type) { return read_index<int8_t, int16_t, int32_t>(f, type); }
+int32_t pragma::assets::importer::mmd::pmx::read_vertex_index(ufile::IFile &f, IndexType type) { return read_index<uint8_t, uint16_t, int32_t>(f, type); }
+std::shared_ptr<pragma::assets::importer::mmd::pmx::ModelData> pragma::assets::importer::mmd::pmx::load(ufile::IFile &f)
 {
 	auto signature = f.Read<std::array<char, 4>>();
 	// Note: The fourth character in the header for the model https://bowlroll.net/file/306256 is '@' instead of a space,
@@ -440,7 +441,7 @@ std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(ufile::IFile &f)
 	return mdlData;
 }
 
-std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(const std::string &path)
+std::shared_ptr<pragma::assets::importer::mmd::pmx::ModelData> pragma::assets::importer::mmd::pmx::load(const std::string &path)
 {
 	VFilePtr f = FileManager::OpenSystemFile(path.c_str(), "rb");
 	if(f == nullptr)
@@ -449,7 +450,7 @@ std::shared_ptr<mmd::pmx::ModelData> mmd::pmx::load(const std::string &path)
 	return load(fp);
 }
 
-std::shared_ptr<mmd::vmd::AnimationData> mmd::vmd::load(const std::string &path)
+std::shared_ptr<pragma::assets::importer::mmd::vmd::AnimationData> pragma::assets::importer::mmd::vmd::load(const std::string &path)
 {
 	VFilePtr f = FileManager::OpenSystemFile(path.c_str(), "rb");
 	if(f == nullptr)
@@ -468,7 +469,7 @@ std::vector<T> read_keyframe_data(ufile::IFile &f)
 	std::sort(keyframes.begin(), keyframes.end(), [](const T &a, const T &b) { return a.frameIndex < b.frameIndex; });
 	return keyframes;
 }
-std::shared_ptr<mmd::vmd::AnimationData> mmd::vmd::load(ufile::IFile &f)
+std::shared_ptr<pragma::assets::importer::mmd::vmd::AnimationData> pragma::assets::importer::mmd::vmd::load(ufile::IFile &f)
 {
 	std::array<char, 30> ident;
 	f.Read(ident.data(), ident.size() * sizeof(ident.front()));
@@ -480,7 +481,7 @@ std::shared_ptr<mmd::vmd::AnimationData> mmd::vmd::load(ufile::IFile &f)
 	else
 		return nullptr;
 
-	auto animData = std::make_shared<mmd::vmd::AnimationData>();
+	auto animData = std::make_shared<pragma::assets::importer::mmd::vmd::AnimationData>();
 
 	std::array<char, 20> mdlName;
 	uint32_t mdlNameLen = (version == 1) ? 10 : 20;
@@ -493,15 +494,13 @@ std::shared_ptr<mmd::vmd::AnimationData> mmd::vmd::load(ufile::IFile &f)
 	animData->lights = read_keyframe_data<Light>(f);
 	return animData;
 }
-#pragma optimize("", on)
 #ifdef MMD_TEST
 int main(int argc, char *argv[])
 {
-	auto mdlData = mmd::pmx::load("mdl.pmx");
+	auto mdlData = pragma::assets::importer::mmd::pmx::load("mdl.pmx");
 
 	for(;;)
 		;
 	return EXIT_SUCCESS;
 }
-#pragma optimize("", on)
 #endif
