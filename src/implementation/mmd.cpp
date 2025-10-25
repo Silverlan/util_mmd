@@ -4,19 +4,15 @@
 
 module;
 
-#include <fsys/filesystem.h>
-#include <sharedutils/util_string.h>
-#include <sharedutils/util_ifile.hpp>
-#include <mathutil/uvec.h>
 #include <utf8.h>
-#include <fsys/ifile.hpp>
-
-#pragma comment(lib, "vfilesystem.lib")
-#pragma comment(lib, "mathutil.lib")
 
 #ifdef MMD_TEST
 #include <iostream>
 #endif
+#include <vector>
+#include <cinttypes>
+#include <algorithm>
+#include <memory>
 
 module pragma.assets.importer.mmd;
 
@@ -29,7 +25,6 @@ namespace pragma::assets::importer::mmd {
 		enum class IndexType : char { Byte = 1, Short = 2, Int = 4 };
 
 		enum class SoftBodyFlag : char { None = 0, BLink = 1, ClusterCreation = BLink << 1, LinkCrossing = ClusterCreation << 1 };
-		REGISTER_BASIC_BITWISE_OPERATORS(SoftBodyFlag);
 
 		static std::string read_text(ufile::IFile &f, TextEncoding encoding);
 		template<typename T0, typename T1, typename T2>
@@ -38,6 +33,12 @@ namespace pragma::assets::importer::mmd {
 		static int32_t read_vertex_index(ufile::IFile &f, IndexType type);
 	};
 };
+
+
+namespace umath::scoped_enum::bitwise {
+	template<>
+	struct enable_bitwise_operators<pragma::assets::importer::mmd::pmx::SoftBodyFlag> : std::true_type {};
+}
 
 pragma::assets::importer::mmd::pmx::Morph::~Morph()
 {
