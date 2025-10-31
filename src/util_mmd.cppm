@@ -4,11 +4,6 @@
 
 module;
 
-#include <array>
-#include <cinttypes>
-#include <vector>
-#include <memory>
-#include <string>
 
 export module pragma.assets.importer.mmd;
 

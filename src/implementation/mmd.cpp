@@ -7,12 +7,7 @@ module;
 #include <utf8.h>
 
 #ifdef MMD_TEST
-#include <iostream>
 #endif
-#include <vector>
-#include <cinttypes>
-#include <algorithm>
-#include <memory>
 
 module pragma.assets.importer.mmd;
 
