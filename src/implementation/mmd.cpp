@@ -7,12 +7,7 @@ module;
 #include <utf8.h>
 
 #ifdef MMD_TEST
-#include <iostream>
 #endif
-#include <vector>
-#include <cinttypes>
-#include <algorithm>
-#include <memory>
 
 module pragma.assets.importer.mmd;
 
@@ -33,7 +28,6 @@ namespace pragma::assets::importer::mmd {
 		static int32_t read_vertex_index(ufile::IFile &f, IndexType type);
 	};
 };
-
 
 namespace umath::scoped_enum::bitwise {
 	template<>

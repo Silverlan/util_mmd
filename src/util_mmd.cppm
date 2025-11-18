@@ -4,12 +4,6 @@
 
 module;
 
-#include <array>
-#include <cinttypes>
-#include <vector>
-#include <memory>
-#include <string>
-
 export module pragma.assets.importer.mmd;
 
 export import pragma.filesystem;
@@ -87,7 +81,7 @@ export {
 
 			struct BaseMorph {};
 
-	#pragma pack(push, 1)
+#pragma pack(push, 1)
 			struct GroupMorph : public BaseMorph {
 				int32_t index;
 				float ratio;
@@ -129,7 +123,7 @@ export {
 				Vector3 velocity;
 				Vector3 torque;
 			};
-	#pragma pack(pop)
+#pragma pack(pop)
 
 			struct Morph {
 				~Morph();
@@ -159,7 +153,7 @@ export {
 		};
 
 		namespace vmd {
-	#pragma pack(push, 1)
+#pragma pack(push, 1)
 			struct Keyframe {
 				std::array<char, 15> boneName;
 				uint32_t frameIndex;
@@ -186,7 +180,7 @@ export {
 				std::array<float, 3> color;
 				std::array<float, 3> position;
 			};
-	#pragma pack(pop)
+#pragma pack(pop)
 			struct AnimationData {
 				std::string modelName;
 				std::vector<Keyframe> keyframes;
