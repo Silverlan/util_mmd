@@ -29,7 +29,6 @@ namespace pragma::assets::importer::mmd {
 	};
 };
 
-
 namespace umath::scoped_enum::bitwise {
 	template<>
 	struct enable_bitwise_operators<pragma::assets::importer::mmd::pmx::SoftBodyFlag> : std::true_type {};
