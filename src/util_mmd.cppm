@@ -4,6 +4,8 @@
 
 module;
 
+#include "util_enum_flags.hpp"
+
 export module pragma.assets.importer.mmd;
 
 export import pragma.filesystem;
@@ -31,13 +33,8 @@ export {
 			using namespace umath::scoped_enum::bitwise;
 		}
 	}
-	namespace umath::scoped_enum::bitwise {
-		template<>
-		struct enable_bitwise_operators<pragma::assets::importer::mmd::pmx::DrawingMode> : std::true_type {};
-
-		template<>
-		struct enable_bitwise_operators<pragma::assets::importer::mmd::pmx::BoneFlag> : std::true_type {};
-	}
+	REGISTER_ENUM_FLAGS(pragma::assets::importer::mmd::pmx::DrawingMode)
+	REGISTER_ENUM_FLAGS(pragma::assets::importer::mmd::pmx::BoneFlag)
 
 	namespace pragma::assets::importer::mmd {
 		namespace pmx {
