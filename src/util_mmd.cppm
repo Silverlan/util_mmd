@@ -30,7 +30,7 @@ export {
 				PhysicsAfterDeform = LocalCoordinate << 1,
 				ExternalParentDeform = PhysicsAfterDeform << 1
 			};
-			using namespace umath::scoped_enum::bitwise;
+			using namespace pragma::math::scoped_enum::bitwise;
 		}
 	}
 	REGISTER_ENUM_FLAGS(pragma::assets::importer::mmd::pmx::DrawingMode)

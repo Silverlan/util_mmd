@@ -29,9 +29,9 @@ namespace pragma::assets::importer::mmd {
 	};
 };
 
-namespace umath::scoped_enum::bitwise {
+namespace pragma::math::scoped_enum::bitwise {
 	template<>
-	struct enable_bitwise_operators<pragma::assets::importer::mmd::pmx::SoftBodyFlag> : std::true_type {};
+	struct enable_bitwise_operators<assets::importer::mmd::pmx::SoftBodyFlag> : std::true_type {};
 }
 
 pragma::assets::importer::mmd::pmx::Morph::~Morph()
@@ -178,7 +178,7 @@ std::shared_ptr<pragma::assets::importer::mmd::pmx::ModelData> pragma::assets::i
 				break;
 			}
 		default:
-			throw std::runtime_error("Invalid weight type: " + std::to_string(umath::to_integral(weightType)));
+			throw std::runtime_error("Invalid weight type: " + std::to_string(math::to_integral(weightType)));
 		}
 		auto edgeScale = f.Read<float>();
 	}
@@ -438,19 +438,19 @@ std::shared_ptr<pragma::assets::importer::mmd::pmx::ModelData> pragma::assets::i
 
 std::shared_ptr<pragma::assets::importer::mmd::pmx::ModelData> pragma::assets::importer::mmd::pmx::load(const std::string &path)
 {
-	VFilePtr f = FileManager::OpenSystemFile(path.c_str(), "rb");
+	auto f = fs::open_system_file(path, fs::FileMode::Read | fs::FileMode::Binary);
 	if(f == nullptr)
 		return nullptr;
-	fsys::File fp {f};
+	fs::File fp {f};
 	return load(fp);
 }
 
 std::shared_ptr<pragma::assets::importer::mmd::vmd::AnimationData> pragma::assets::importer::mmd::vmd::load(const std::string &path)
 {
-	VFilePtr f = FileManager::OpenSystemFile(path.c_str(), "rb");
+	auto f = fs::open_system_file(path.c_str(), fs::FileMode::Read | fs::FileMode::Binary);
 	if(f == nullptr)
 		return nullptr;
-	fsys::File fp {f};
+	fs::File fp {f};
 	return load(fp);
 }
 
@@ -469,14 +469,14 @@ std::shared_ptr<pragma::assets::importer::mmd::vmd::AnimationData> pragma::asset
 	std::array<char, 30> ident;
 	f.Read(ident.data(), ident.size() * sizeof(ident.front()));
 	uint32_t version;
-	if(ustring::compare(ident.data(), "Vocaloid Motion Data file"))
+	if(string::compare(ident.data(), "Vocaloid Motion Data file"))
 		version = 1;
-	else if(ustring::compare(ident.data(), "Vocaloid Motion Data 0002"))
+	else if(string::compare(ident.data(), "Vocaloid Motion Data 0002"))
 		version = 2;
 	else
 		return nullptr;
 
-	auto animData = std::make_shared<pragma::assets::importer::mmd::vmd::AnimationData>();
+	auto animData = std::make_shared<AnimationData>();
 
 	std::array<char, 20> mdlName;
 	uint32_t mdlNameLen = (version == 1) ? 10 : 20;
