@@ -178,7 +178,7 @@ std::shared_ptr<pragma::assets::importer::mmd::pmx::ModelData> pragma::assets::i
 				break;
 			}
 		default:
-			throw std::runtime_error("Invalid weight type: " + std::to_string(math::to_integral(weightType)));
+			throw std::runtime_error("Invalid weight type: " + util::to_string(math::to_integral(weightType)));
 		}
 		auto edgeScale = f.Read<float>();
 	}
